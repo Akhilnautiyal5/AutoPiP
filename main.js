@@ -3,6 +3,7 @@ var prevTab = null;
 var targetTab = null;
 var log = []
 var toggle = true;
+var rewindSeconds = 10; // Number of seconds to rewind
 
 // Get Settings
 chrome.storage.sync.get(['toggle'], function(result) {
@@ -19,7 +20,7 @@ chrome.tabs.onActivated.addListener(function(tab) {
   
   // --- [1] : Check for playing videos *(set target)  ---
   if (targetTab === null){
-    console.log(">> Check PiP For:", currentTab)
+    console.log(">> Check PiP For:", currentTab);
     chrome.scripting.executeScript({target: {tabId: currentTab}, files: ['./scripts/check-video.js']}, (results) => {
       console.log("Has Video:", results[0].result);
       if (results[0].result) targetTab = currentTab;
@@ -70,3 +71,37 @@ chrome.tabs.onActivated.addListener(function(tab) {
   // --- [ Update ] ---
   prevTab = tab.tabId;
 });
+
+// --- [ FUNCTION: Keyboard Control for Video ] --- //
+function addVideoKeyboardControls() {
+	document.addEventListener("keydown", (event) => {
+		const video =
+			document.querySelector("[__pip__]") || document.querySelector("video");
+
+		if (!video) return;
+
+		switch (event.keyCode) {
+			case 32: // Spacebar
+				event.preventDefault();
+				if (video.paused) {
+					video.play();
+				} else {
+					video.pause();
+				}
+				break;
+			case 37: // Left Arrow (rewind)
+				event.preventDefault();
+				video.currentTime = Math.max(0, video.currentTime - rewindSeconds);
+				break;
+			case 39: // Right Arrow
+				event.preventDefault();
+				video.currentTime = Math.min(
+					video.duration,
+					video.currentTime + rewindSeconds
+				);
+				break;
+			default:
+				break;
+		}
+	});
+}
