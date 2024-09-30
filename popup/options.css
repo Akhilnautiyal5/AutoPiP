@@ -52,3 +52,21 @@ a:hover{
 #version{
     opacity: 0.3;
 }
+
+.hotkey-settings {
+    margin-top: 0.5rem;
+}
+
+.hotkey-input {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+}
+
+.hotkey-input input {
+    width: 100px;
+}
+
+#saveHotkeys {
+    margin-top: 0.5rem;
+}
